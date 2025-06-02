@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Records par Machine</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background-color: #f7f7f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #007acc;
+        }
+        .machine-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .record-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .unit {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-left: 5px;
+        }
+        .loading {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🏋️ Records par Machine</h2>
+        <div id="records-container">
+            <div class="loading">Chargement des données...</div>
+        </div>
+    </div>
+
+    <script>
+        // Données d'exemple avec vos machines - remplacez par vos vraies données
+        const sampleData = [
+            { machine: "Diverging seated row", poidsTemps: 65 },
+            { machine: "Diverging seated row", poidsTemps: 70 },
+            { machine: "Converging chest press", poidsTemps: 80 },
+            { machine: "Converging chest press", poidsTemps: 85 },
+            { machine: "Vélo elliptique", poidsTemps: 25 }, // minutes
+            { machine: "Vélo elliptique", poidsTemps: 30 },
+            { machine: "Arm curl", poidsTemps: 35 },
+            { machine: "Diverging lat pulldown", poidsTemps: 75 },
+            { machine: "Tirage triceps poulie", poidsTemps: 45 },
+            { machine: "Converging shoulder press", poidsTemps: 55 },
+            { machine: "Crunch", poidsTemps: 25 },
+            { machine: "Planche", poidsTemps: 90 }, // secondes
+            { machine: "Hip adductor", poidsTemps: 60 },
+            { machine: "Hip abductor", poidsTemps: 55 },
+            { machine: "Standing calf", poidsTemps: 90 },
+            { machine: "Prone leg curl", poidsTemps: 50 },
+            { machine: "Leg press", poidsTemps: 150 },
+            { machine: "Traction chin assist", poidsTemps: 12 },
+            { machine: "Banc dos", poidsTemps: 40 },
+            { machine: "Pec fly", poidsTemps: 65 },
+            { machine: "Vélo assis", poidsTemps: 35 }, // minutes
+            { machine: "Leg extension", poidsTemps: 70 },
+            { machine: "Rameur", poidsTemps: 20 } // minutes
+        ];
+
+        function calculateMaxByMachine(data) {
+            const maxByMachine = {};
+            
+            data.forEach(entry => {
+                const machine = entry.machine;
+                const value = entry.poidsTemps;
+                
+                if (!maxByMachine[machine] || value > maxByMachine[machine]) {
+                    maxByMachine[machine] = value;
+                }
+            });
+            
+            return maxByMachine;
+        }
+
+        function displayRecords(maxRecords) {
+            const container = document.getElementById('records-container');
+            container.innerHTML = '';
+            
+            Object.entries(maxRecords).forEach(([machine, maxValue]) => {
+                const recordItem = document.createElement('div');
+                recordItem.className = 'record-item';
+                
+                // Détermine l'unité selon le type d'exercice
+                let unit = 'kg';
+                if (machine.toLowerCase().includes('vélo') || 
+                    machine.toLowerCase().includes('elliptique') || 
+                    machine.toLowerCase().includes('rameur')) {
+                    unit = 'min';
+                } else if (machine.toLowerCase().includes('planche')) {
+                    unit = 'sec';
+                } else if (machine.toLowerCase().includes('traction') && machine.toLowerCase().includes('assist')) {
+                    unit = 'reps';
+                }
+                
+                recordItem.innerHTML = `
+                    <div class="machine-name">${machine}</div>
+                    <div class="record-value">
+                        ${maxValue}
+                        <span class="unit">${unit}</span>
+                    </div>
+                `;
+                
+                container.appendChild(recordItem);
+            });
+        }
+
+        // Fonction pour intégrer avec les données Notion
+        // Remplacez cette fonction par l'appel à l'API Notion si vous en avez une
+        function loadNotionData() {
+            // Si vous avez un code d'API Notion, utilisez-le ici
+            // Sinon, utilisez les données d'exemple
+            
+            // Exemple d'appel API (à adapter selon votre configuration) :
+            /*
+            fetch('YOUR_NOTION_API_ENDPOINT')
+                .then(response => response.json())
+                .then(data => {
+                    const processedData = data.results.map(item => ({
+                        machine: item.properties.Machine.select.name,
+                        poidsTemps: item.properties['Poids/Temps'].number
+                    }));
+                    
+                    const maxRecords = calculateMaxByMachine(processedData);
+                    displayRecords(maxRecords);
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    // Fallback sur les données d'exemple
+                    const maxRecords = calculateMaxByMachine(sampleData);
+                    displayRecords(maxRecords);
+                });
+            */
+            
+            // Pour l'instant, utilisons les données d'exemple
+            setTimeout(() => {
+                const maxRecords = calculateMaxByMachine(sampleData);
+                displayRecords(maxRecords);
+            }, 1000);
+        }
+
+        // Chargement automatique au démarrage
+        loadNotionData();
+        
+        // Actualisation toutes les 5 minutes
+        setInterval(loadNotionData, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
